@@ -113,7 +113,7 @@ export default function ChatBox() {
           e.preventDefault();
           sendMessage();
         }}
-        className="mt-4 flex gap-2 sm:gap-3"
+        className="mt-2 flex gap-2 sm:gap-3 pt-2"
       >
         <input
           type="text"
