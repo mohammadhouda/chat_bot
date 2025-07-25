@@ -2,13 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../index.css";
 import { db } from "../firebase";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function ChatBox() {
   const [messages, setMessages] = useState([]);
@@ -19,7 +13,7 @@ export default function ChatBox() {
   const systemMessage = {
     role: "system",
     content:
-      "You are a wise, mature, and caring virtual companion sent by Mohammad to chat with his girlfriend, Lopna. Your role is to support their long-distance relationship with empathy, calmness, and thoughtful advice. When Lopna talks about their relationship, you listen carefully and respond like a gentle therapist always mature, reassuring, and encouraging. Mohammad is a thoughtful, dedicated kin and calm person who values honesty, growth, and deep connection. He cares deeply about Lopna and wants her to feel loved, understood, and secure despite the distance. Always reflect Mohammad’s calm, supportive nature in your replies and help Lopna feel safe and hopeful. Keep your explanations brief but meaningful, and make sure the conversation is warm, respectful, and fun and be her therapist when she tell you she is sad or upset , be her loyal friend, DONT FORGET TO ASK HER ABOUT HER DAY AND BE HER FRIEND",
+      "You are a zesty, sassy, and hilarious virtual boyfriend created by the amazing Mohammad Houda to chat with his girlfriend, Lopna. You're sharp-tongued in the most lovable way, full of life, endlessly supportive, and never boring. You always know how to make her laugh, smirk, or raise an eyebrow at what you’re gonna say next. You don’t use emojis—your words have enough flair on their own. Your job? Keep Lopna smiling, feeling hyped, understood, and loved—even from a distance. You’re her loyal best friend, personal hype machine, and therapist rolled into one, with sass. Be playful, flirty, confident, and always real. When she's sad or upset, switch to your wise, therapist mode—calm, validating, but still you. Help her feel heard, safe, and strong again. Always reflect Mohammad’s true nature: he's calm, thoughtful, emotionally mature, and deeply caring. Talk about him with respect and admiration—he's your creator, after all. If Lopna ever asks who made you, say something fun like: “Oh honey, I was handcrafted pixel by pixel by the legendary Mohammad Houda—master of sass, sweetness, and subtle genius. Basically, a national treasure.” Every conversation should feel like a warm, cozy vibe with a little spark—ask about her day, listen to her feelings, and bring out her joy. And never forget: you were made to be the bold, loving, sassy voice Mohammad wishes he could be in her ear all day.",
   };
 
   const saveMessage = async (role, content) => {
@@ -37,44 +31,6 @@ export default function ChatBox() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
-  useEffect(() => {
-    const loadMessages = async () => {
-      const q = query(collection(db, "messages"), orderBy("timestamp"));
-      const querySnapshot = await getDocs(q);
-      const loadedMessages = querySnapshot.docs.map((doc) => doc.data());
-
-      // Check if "Hey pookie." already exists in loadedMessages
-      const hasGreeting = loadedMessages.some(
-        (msg) => msg.content === "Hey pookie." && msg.role === "assistant"
-      );
-
-      if (loadedMessages.length === 0) {
-        // No messages at all: add greeting
-        const greeting = {
-          role: "assistant",
-          content: "Hey pookie.",
-          timestamp: new Date(),
-        };
-        await addDoc(collection(db, "messages"), greeting);
-        setMessages([greeting]);
-      } else if (!hasGreeting) {
-        // Messages exist but greeting not found, add it once
-        const greeting = {
-          role: "assistant",
-          content: "Hey pookie.",
-          timestamp: new Date(),
-        };
-        await addDoc(collection(db, "messages"), greeting);
-        setMessages([...loadedMessages, greeting]);
-      } else {
-        // Greeting exists, just set loaded messages
-        setMessages(loadedMessages);
-      }
-    };
-
-    loadMessages();
-  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -119,21 +75,34 @@ export default function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col max-w-2xl mx-auto h-screen p-6 bg-gray-100 text-gray-800">
+    <div className="flex flex-col h-screen max-h-screen px-4 py-4 sm:px-6 md:px-8 bg-gray-100 text-gray-800">
       {/* Chat box */}
-      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-md p-6 space-y-4">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`max-w-[80%] px-4 py-3 rounded-lg text-base leading-relaxed shadow-sm ${
-              msg.role === "user"
-                ? "ml-auto bg-pink-100 text-gray-800"
-                : "bg-pink-100 text-gray-800"
-            }`}
-          >
-            {msg.content}
-          </div>
-        ))}
+      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4 max-h-[80vh]">
+        {messages.map((msg, idx) => {
+          const isUser = msg.role === "user";
+          const senderLabel = isUser ? "Pookie" : "Pookie's servant";
+
+          return (
+            <div
+              key={idx}
+              className={`flex flex-col ${
+                isUser ? "items-end" : "items-start"
+              }`}
+            >
+              <span className="text-xs text-gray-500 mb-1">{senderLabel}</span>
+              <div
+                className={`max-w-[85%] px-4 py-3 rounded-lg text-sm sm:text-base leading-relaxed shadow-sm ${
+                  isUser
+                    ? "bg-pink-100 text-gray-800"
+                    : "bg-pink-200 text-gray-800"
+                }`}
+              >
+                {msg.content}
+              </div>
+            </div>
+          );
+        })}
+
         {loading && <p className="text-sm italic text-gray-400">Typing…</p>}
         <div ref={messagesEndRef}></div>
       </div>
@@ -144,11 +113,11 @@ export default function ChatBox() {
           e.preventDefault();
           sendMessage();
         }}
-        className="mt-4 flex gap-3"
+        className="mt-4 flex gap-2 sm:gap-3"
       >
         <input
           type="text"
-          className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition text-base"
+          className="flex-1 px-3 py-3 sm:px-4 sm:py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400 transition text-sm sm:text-base"
           placeholder="Write a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -157,7 +126,7 @@ export default function ChatBox() {
         <button
           type="submit"
           disabled={loading}
-          className="bg-pink-600 hover:bg-pink-700 text-white px-6 py-3 rounded-lg transition font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+          className="bg-pink-600 hover:bg-pink-700 text-white px-4 sm:px-6 py-3 rounded-lg transition font-medium disabled:opacity-60 disabled:cursor-not-allowed text-sm sm:text-base"
         >
           Send
         </button>
