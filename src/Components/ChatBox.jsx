@@ -75,9 +75,9 @@ export default function ChatBox() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-h-screen px-4 py-4 sm:px-6 md:px-8 bg-gray-100 text-gray-800">
+    <div className="flex flex-col h-[100dvh] px-4 py-4 sm:px-6 md:px-8 bg-gray-100 text-gray-800">
       {/* Chat box */}
-      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4 max-h-[80vh]">
+      <div className="flex-1 overflow-y-auto bg-white rounded-xl shadow-md p-4 sm:p-6 space-y-4">
         {messages.map((msg, idx) => {
           const isUser = msg.role === "user";
           const senderLabel = isUser ? "Pookie" : "Pookie's servant";
@@ -107,13 +107,13 @@ export default function ChatBox() {
         <div ref={messagesEndRef}></div>
       </div>
 
-      {/* Input field */}
+      {/* Sticky Input field */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
           sendMessage();
         }}
-        className="mt-2 flex gap-2 sm:gap-3 pt-2"
+        className="sticky bottom-0 mt-4 bg-gray-100 pt-4 flex gap-2 sm:gap-3"
       >
         <input
           type="text"
